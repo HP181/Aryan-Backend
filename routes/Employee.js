@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const dynamoDB = require("../config/aws-dynamodb");
+const dynamoDB = require("../config/db");  // Load DynamoDB configuration
 
 // POST route - Add a new employee
 router.post("/", async (req, res) => {
@@ -8,9 +8,9 @@ router.post("/", async (req, res) => {
   
     // Step 1: Check if the email already exists
     const checkParams = {
-      TableName: "Employee",
+      TableName: "Employee",  // DynamoDB table name
       Key: {
-        email: email, // Use email as the primary key
+        email: email,  // Use email as the primary key
       },
     };
   
@@ -18,7 +18,6 @@ router.post("/", async (req, res) => {
       // Check if the employee already exists
       const existingEmployee = await dynamoDB.get(checkParams).promise();
 
-  
       // If the email exists, respond with an error
       if (existingEmployee.Item) {
         return res.status(400).json({
@@ -46,24 +45,18 @@ router.post("/", async (req, res) => {
       console.error("Error adding employee:", err);
       res.status(500).json({ message: "Failed to add employee", error: err.message });
     }
-  });
-  
+});
 
 // GET route - Retrieve all employees
 router.get("/", async (req, res) => {
-    // AWS.config.update({
-    //     region: process.env.AWS_REGION,
-    //     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    //     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    // });
   const params = {
-    TableName: "Employee", // DynamoDB table name
+    TableName: "Employee",  // DynamoDB table name
   };
 
   try {
     // Fetch all employees from DynamoDB
     const data = await dynamoDB.scan(params).promise();
-    res.json(data.Items); // Returns an array of employees
+    res.json(data.Items);  // Returns an array of employees
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch employees", error: err.message });
   }
