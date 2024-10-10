@@ -22,4 +22,8 @@ app.use(express.json());
 app.use("/api/employees", require("./routes/employee"));  // Make sure to load employee routes
 
 // Export the app as a Lambda handler
-module.exports.handler = serverless(app);
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
